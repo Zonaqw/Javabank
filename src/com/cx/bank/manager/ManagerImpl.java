@@ -17,15 +17,15 @@
     }
 
     MoneyBean m1 = MoneyBean.getMoneyBean();
-    //ÍË³öÏµÍ³
+    //é€€å‡ºç³»ç»Ÿ
     public void exitSystem(){
         System.exit(0);
     }
-    //²éÑ¯
+    //æŸ¥è¯¢
     public double inquiry(){
         return m1.getMoney();
     }
-    //È¡¿î
+    //å–æ¬¾
     public double withdrawals(double _money){
 
             m1.setMoney(m1.getMoney() - _money);
@@ -33,7 +33,7 @@
             return m1.getMoney();
         }
 
-    //´æ¿î
+    //å­˜æ¬¾
     public double deposit(double _money){
 
         m1.setMoney(m1.getMoney() + _money);
