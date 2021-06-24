@@ -1,9 +1,10 @@
-package com.cx.bank.manager;
+
+ package com.cx.bank.manager;
 
 
-public interface Manager {
+ public interface Manager {
     void exitSystem();
     double inquiry();
-    double withdrawals(double _money);
-    double deposit(double _money);
-}
+    boolean withdrawals(double _money);
+    boolean deposit(double _money);
+ }

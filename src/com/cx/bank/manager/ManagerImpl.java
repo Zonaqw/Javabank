@@ -3,12 +3,12 @@
 
  import com.cx.bank.model.MoneyBean;
 
+ import java.util.Scanner;
+
  public class ManagerImpl implements Manager{
     private static ManagerImpl managerimpl;
-    private ManagerImpl(){
-
-    }
-
+    Scanner in = new Scanner(System.in);
+    private ManagerImpl(){}
     public static ManagerImpl getManagerImpl() {
         if (managerimpl == null) {
             managerimpl = new ManagerImpl();
@@ -17,27 +17,43 @@
     }
 
     MoneyBean m1 = MoneyBean.getMoneyBean();
-    //é€€å‡ºç³»ç»Ÿ
-    public void exitSystem(){
-        System.exit(0);
-    }
-    //æŸ¥è¯¢
-    public double inquiry(){
-        return m1.getMoney();
-    }
-    //å–æ¬¾
-    public double withdrawals(double _money){
 
-            m1.setMoney(m1.getMoney() - _money);
+    /*
+    * ÍË³öÏµÍ³
+    * */
+    public void exitSystem(){ System.exit(0); }
 
-            return m1.getMoney();
+    /*²éÑ¯Óà¶î£¬¶ÔÕË»§ÖÐµÄmoney½øÐÐ²éÑ¯²Ù×÷
+    * @return ·µ»ØÓà¶î
+    * */
+    public double inquiry(){ return m1.getMoney(); }
+
+    /*´ÓÒøÐÐÀïÈ¡Ç®
+     *@param qumoney
+     *@return ·µ»ØbooleanÀàÐÍµÄflag,Èç¹ûÄÜÈ¡µ½Ç®£¬·µ»Øtrue,Èç¹û²»ÄÜ£¬·µ»Øfalse
+     */
+    public boolean withdrawals(double qumoney){
+            boolean flag=true;
+            if(qumoney>inquiry()){
+                System.out.println("Óà¶î²»×ã");
+                flag=false;
+            }else if(qumoney<0){
+                flag = false;
+            }
+            m1.setMoney(m1.getMoney() - qumoney);
+            return flag;
         }
-
-    //å­˜æ¬¾
-    public double deposit(double _money){
-
-        m1.setMoney(m1.getMoney() + _money);
-
-        return m1.getMoney();
+    /*
+    * ´ÓÒøÐÐÀï´æÇ®
+    * @param cunmoney
+    * @return ·µ»ØbooleanÀàÐÍµÄflagÖµ£¬Èç¹ûÄÜ´æµ½Ç®£¬Ôò·µ»Øtrue£¬Èç¹û²»ÄÜ´æµ½Ç®£¬Ôò·µ»Øfalse
+    * */
+    public boolean deposit(double cunmoney){
+        boolean flag = true;
+        if(cunmoney < 0) {
+            flag = false;
+        }
+        m1.setMoney(m1.getMoney() + cunmoney);
+        return flag;
     }
  }
