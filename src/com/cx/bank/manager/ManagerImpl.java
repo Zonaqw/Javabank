@@ -2,9 +2,13 @@
  package com.cx.bank.manager;
 
  import com.cx.bank.model.MoneyBean;
+ import com.cx.bank.util.AccountOverDrawnException;
+ import com.cx.bank.util.InvalidDepositException;
 
  import java.util.Scanner;
-
+ /*
+ *实现接口Manager里的方法
+ */
  public class ManagerImpl implements Manager{
     private static ManagerImpl managerimpl;
     Scanner in = new Scanner(System.in);
@@ -15,7 +19,6 @@
         }
         return managerimpl;
     }
-
     MoneyBean m1 = MoneyBean.getMoneyBean();
 
     /*
@@ -30,30 +33,24 @@
 
     /*从银行里取钱
      *@param qumoney
-     *@return 返回boolean类型的flag,如果能取到钱，返回true,如果不能，返回false
      */
-    public boolean withdrawals(double qumoney){
-            boolean flag=true;
+    public void withdrawals(Double qumoney) throws AccountOverDrawnException {
             if(qumoney>inquiry()){
-                System.out.println("余额不足");
-                flag=false;
-            }else if(qumoney<0){
-                flag = false;
+                throw new AccountOverDrawnException("余额不足");
+            }
+            else if(qumoney<0){
+                throw new AccountOverDrawnException("取钱不能取负的");
             }
             m1.setMoney(m1.getMoney() - qumoney);
-            return flag;
         }
     /*
     * 从银行里存钱
     * @param cunmoney
-    * @return 返回boolean类型的flag值，如果能存到钱，则返回true，如果不能存到钱，则返回false
     * */
-    public boolean deposit(double cunmoney){
-        boolean flag = true;
+    public void deposit(Double cunmoney) throws InvalidDepositException {
         if(cunmoney < 0) {
-            flag = false;
+            throw new InvalidDepositException("存钱不能存负的");
         }
         m1.setMoney(m1.getMoney() + cunmoney);
-        return flag;
     }
  }

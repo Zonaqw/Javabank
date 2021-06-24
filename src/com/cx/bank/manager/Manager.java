@@ -1,10 +1,11 @@
 
  package com.cx.bank.manager;
 
-
+ /*创建接口Manager,定义方法
+ * */
  public interface Manager {
     void exitSystem();
     double inquiry();
-    boolean withdrawals(double _money);
-    boolean deposit(double _money);
+    void withdrawals(Double _money);
+    void deposit(Double _money);
  }
