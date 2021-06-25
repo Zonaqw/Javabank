@@ -28,7 +28,7 @@
                     manager.withdrawals(qumoney);//调用取款方法withdrawals()
                     System.out.println("取款成功，您的余额为:"+manager.inquiry());
                 }catch (AccountOverDrawnException e) {
-                    System.out.println("warning"+e.getMessage());
+                    System.out.println("warning: "+e.getMessage());
                    // e.printStackTrace();
                 }
             }else if ("3".equals(a)){
@@ -39,7 +39,7 @@
                     manager.deposit(cunmoney);//调用存款方法deposit()
                     System.out.println("存款成功，您的余额为:"+manager.inquiry());
                 }catch (InvalidDepositException e){
-                    System.out.println("warning"+e.getMessage());
+                    System.out.println("warning: "+e.getMessage());
                    // e.printStackTrace();
                 }
             }else if ("4".equals(a)){

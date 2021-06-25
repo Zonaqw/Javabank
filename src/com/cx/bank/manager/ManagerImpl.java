@@ -49,8 +49,8 @@
     * */
     public void deposit(Double cunmoney) throws InvalidDepositException {
         if(cunmoney < 0) {
-            throw new InvalidDepositException("存钱不能存负的");
+        throw new InvalidDepositException("存钱不能存负的");
         }
-        m1.setMoney(m1.getMoney() + cunmoney);
+    m1.setMoney(m1.getMoney() + cunmoney);
     }
  }
