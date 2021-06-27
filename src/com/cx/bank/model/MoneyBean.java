@@ -1,5 +1,12 @@
 
  package com.cx.bank.model;
+
+/*@projectName Javabank
+ * @package com.cx.bank.model
+ * @className MoneyBean
+ * @description 用于封装余额数据
+ * @version v1.4
+ * */
  public class MoneyBean{
     private double money;
     private static  MoneyBean moneyBean ; //单例
