@@ -1,8 +1,9 @@
 
  package com.cx.bank.manager;
 
- import com.cx.bank.util.AccountOverDrawnException;
- import com.cx.bank.util.InvalidDepositException;
+ import com.cx.bank.util.*;
+
+ import java.io.IOException;
 
  /*创建接口Manager,定义需要使用的方法
  * */
@@ -33,18 +34,30 @@
     void deposit(Double _money) throws InvalidDepositException;
 
    /**
-    * 注册
+    *
+    *
     * @param _uname
     * @param _upwd
-    * @return
+    * @throws RegisterException
+    * @throws IOException
     */
-    boolean register(String _uname,String _upwd);
+    void register(String _uname,String _upwd) throws RegisterException, IOException;
 
    /**
-    * 登录
+    *
     * @param _uname
     * @param _upwd
-    * @return
+    * @throws LoginException
+    * @throws IOException
     */
-    boolean login(String _uname,String _upwd);
+    void login(String _uname,String _upwd) throws LoginException, IOException;
+
+   /**
+    *
+    * @param others
+    * @param money
+    * @throws IOException
+    * @throws TransferException
+    */
+    void transfer(String others,String money) throws IOException, TransferException;
  }

@@ -31,7 +31,7 @@
      * 转账说明
      * @param others
      * @param money
-     * @return 转账成功返回true 转账失败返回false
+     * @throws IOException
      */
-      boolean transfer(String others,String money) ;
+      void transfer(String others,String money) throws IOException;
   }

@@ -4,8 +4,7 @@
  import com.cx.bank.dao.BankDaoImpl;
  import com.cx.bank.model.MoneyBean;
  import com.cx.bank.model.UserBean;
- import com.cx.bank.util.AccountOverDrawnException;
- import com.cx.bank.util.InvalidDepositException;
+ import com.cx.bank.util.*;
 
  import java.io.File;
  import java.io.FileInputStream;
@@ -14,7 +13,9 @@
  import java.util.Properties;
  import java.util.Scanner;
 
-/*@projectName Javabank
+ import static com.cx.bank.dao.BankDaoImpl.properties;
+
+ /*@projectName Javabank
  * @package com.cx.bank.manager
  * @className ManagerImpl
  * @description 用于实现各种功能模块
@@ -37,6 +38,7 @@
       * BankDaoImpl对象，存储并读取数据
       * props对象，将读取的数据暂时存储
       */
+    UserBean userBean=UserBean.getUserBean();
     MoneyBean m1 = MoneyBean.getMoneyBean();
     BankDaoImpl b1 = BankDaoImpl.getBankDaoImpl();
     Properties props = BankDaoImpl.getProps();
@@ -84,26 +86,24 @@
    * @return flag
    */
      @Override
-     public boolean register(String _uname,String _upwd)  {
-
-            boolean flag = true;
+     public void register(String _uname,String _upwd) throws RegisterException, IOException {
 
             //用户名和密码不能为空
-            if(_uname==null||_upwd==null) return false;
+            if(_uname==null||_upwd==null){
+              throw new RegisterException("用户名和密码不能为空");
+            }
 
             //用户和密码不能已经存在
             File dir = new File(".\\"+_uname+".properties");
-            if (dir.exists()) flag=false;
+            if (dir.exists()){
 
-            //将用户名和密码写入文件中
-            try {
-              if(flag) b1.register(_uname, _upwd);
-            }catch (IOException e){
-              System.out.println(e);
+              throw new RegisterException("用户已经存在");
             }
 
+            //将用户名和密码写入文件中
 
-            return flag;
+              b1.register(_uname, _upwd);
+
      }
 
   /**
@@ -113,30 +113,54 @@
    * @return flag
    */
      @Override
-     public boolean login(String _uname,String _upwd) {
-
-        boolean flag = true;
-
+     public void login(String _uname,String _upwd) throws LoginException, IOException {
         //用户名和密码不能为空
-        if (_uname == null || _upwd == null)  return false;
-
+        if (_uname == null || _upwd == null) {
+           throw new LoginException("用户名和密码不能为空");
+        }
         //用户名和密码不能不存在
          File dir = new File(".\\"+_uname+".properties");
-         if (!dir.exists()) flag=false;
+         if (!dir.exists()){
+           throw new LoginException("用户不存在");
+         }
 
         //读取并存储数据
-       try {
          b1.login(_uname, _upwd);
-       }catch (IOException e) {
-         System.out.println("没有这个用户名，请检查用户名是否输入正确");
-         flag = false;
-       }
         //判断输入的用户名和密码是否正确，如果错误，显示登录失败
         if(_uname.equals(props.getProperty("uname"))&&_upwd.equals(props.getProperty("upwd"))){
-            flag = true;
+          userBean.setName(props.getProperty("uname"));
+          userBean.setPassword(props.getProperty("upwd"));
+          m1.setMoney(Double.parseDouble(props.getProperty("money")));
         }else {
-          flag = false;
+          throw new LoginException("用户名或密码错误");
         }
-        return flag;
+
      }
- }
+
+   /**
+    *
+    * @param others
+    * @param money
+    * @return
+    */
+  @Override
+  public  void transfer(String others, String money) throws IOException, TransferException {
+
+    File file = new File(".//"+others+".properties");
+    if (!file.exists()){
+      throw new TransferException("没有这个用户");
+    }
+    if(Double.parseDouble(money)>m1.getMoney()) {
+      throw new TransferException("余额不足");
+    }
+    if(Double.parseDouble(money)<0){
+      throw new TransferException("金额不能为负数");
+    }
+    b1.transfer(others, money);
+    if(properties.getProperty("uname").equals(userBean.getName())){
+      throw new TransferException("不能给自己转账");
+    }
+
+
+  }
+}

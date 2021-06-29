@@ -4,10 +4,7 @@
   import com.cx.bank.model.MoneyBean;
   import com.cx.bank.model.UserBean;
 
-  import java.io.File;
-  import java.io.FileInputStream;
-  import java.io.FileOutputStream;
-  import java.io.IOException;
+  import java.io.*;
   import java.util.Properties;
 
   /*@projectName Javabank
@@ -18,6 +15,7 @@
   public class BankDaoImpl implements BankDaoInterface
   {
       private static Properties props;
+      public static Properties properties=new Properties();
       MoneyBean m1 = MoneyBean.getMoneyBean();
       UserBean userBean = UserBean.getUserBean();
       private static BankDaoImpl bankDaoImpl;
@@ -39,9 +37,9 @@
           }
 
       }
-      //赋初值
+
       private BankDaoImpl(){
-          m1.setMoney(Double.parseDouble(props.getProperty("money")));
+
       }
 
       public static Properties getProps() {
@@ -64,7 +62,7 @@
           try{
               FileOutputStream out = new
                       FileOutputStream(".\\"+userBean.getName()+".properties");
-              props.store(out, ".\\"+userBean.getName() + ".properties");
+              props.store(out, "");
               out.close();
           }
           catch(IOException e)
@@ -82,7 +80,7 @@
           props.setProperty("money","10.0");
 
           FileOutputStream out = new FileOutputStream(".\\"+_uname+".properties");
-          props.store(out,".\\"+_uname+".properties");
+          props.store(out,"");
           out.close();
       }
       /*
@@ -94,9 +92,7 @@
               FileInputStream input = new FileInputStream(f0);
               props.load(input);
               input.close();
-              userBean.setName(props.getProperty("uname"));
-              userBean.setPassword(props.getProperty("upwd"));
-              m1.setMoney(Double.parseDouble(props.getProperty("money")));
+
       }
 
     /**
@@ -106,11 +102,9 @@
      * @return 转账成功返回true,转账失败返回false
      */
       @Override
-      public boolean transfer(String others,String money)  {
-        try {
-          if(Double.parseDouble(money)>m1.getMoney()||Double.parseDouble(money)<0) return false;
+      public void transfer(String others,String money) throws IOException  {
           //读取要转账对象的文件
-          Properties properties=new Properties();
+
           File f0=new File(".\\"+others+".properties");
           FileInputStream input = new FileInputStream(f0);
           properties.load(input);
@@ -125,9 +119,5 @@
           properties.store(out,".\\"+others+".properties");
           out.close();
 
-        } catch (IOException | NumberFormatException e) {
-          e.printStackTrace();
-        }
-        return true;
       }
   }
