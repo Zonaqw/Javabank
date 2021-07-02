@@ -1,11 +1,14 @@
 
   package com.cx.bank.dao;
 
-  import com.cx.bank.model.MoneyBean;
-  import com.cx.bank.model.UserBean;
+
+  import com.cx.bank.util.MD5;
 
   import java.io.*;
   import java.util.Properties;
+
+  import static com.cx.bank.manager.ManagerImpl.m1;
+  import static com.cx.bank.manager.ManagerImpl.userBean;
 
   /*@projectName Javabank
   * @package com.cx.bank.dao
@@ -15,11 +18,17 @@
   public class BankDaoImpl implements BankDaoInterface
   {
       private static Properties props;
-      public static Properties properties=new Properties();
-      MoneyBean m1 = MoneyBean.getMoneyBean();
-      UserBean userBean = UserBean.getUserBean();
+      public static Properties properties;
       private static BankDaoImpl bankDaoImpl;
 
+      private BankDaoImpl() {
+
+      }
+      public static BankDaoImpl getBankDaoImpl() {
+          if(bankDaoImpl == null)
+              bankDaoImpl=new BankDaoImpl();
+          return bankDaoImpl;
+      }
       //静态代码块，给静态变量初始化
    static
       {
@@ -38,19 +47,9 @@
 
       }
 
-      private BankDaoImpl(){
-
-      }
 
       public static Properties getProps() {
           return props;
-      }
-
-      public static BankDaoImpl getBankDaoImpl() {
-          if (bankDaoImpl == null) {
-              bankDaoImpl = new BankDaoImpl();
-          }
-          return bankDaoImpl;
       }
 
       /**
@@ -75,8 +74,9 @@
       * */
       @Override
       public void register(String _uname,String _upwd) throws IOException {
+          MD5 md5=new MD5();
           props.setProperty("uname",_uname);
-          props.setProperty("upwd",_upwd);
+          props.setProperty("upwd", md5.getMD5(_upwd));
           props.setProperty("money","10.0");
 
           FileOutputStream out = new FileOutputStream(".\\"+_uname+".properties");
@@ -92,19 +92,16 @@
               FileInputStream input = new FileInputStream(f0);
               props.load(input);
               input.close();
-
       }
-
     /**
      * 转账功能实现
      * @param others
      * @param money
-     * @return 转账成功返回true,转账失败返回false
      */
       @Override
       public void transfer(String others,String money) throws IOException  {
           //读取要转账对象的文件
-
+          properties=new Properties();
           File f0=new File(".\\"+others+".properties");
           FileInputStream input = new FileInputStream(f0);
           properties.load(input);
