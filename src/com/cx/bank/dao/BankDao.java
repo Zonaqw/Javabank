@@ -8,18 +8,9 @@ import org.junit.Test;
 import java.io.*;
 import java.util.Properties;
 
-public class BankDaoImpl implements BankDaoInterface{
+public class BankDao implements BankDaoInterface{
 
-    private static BankDaoImpl bankDaoImpl;
-
-  //  private BankDaoImpl(){}
-
-    public static BankDaoImpl getInstance() {
-        if (bankDaoImpl == null) {
-          return new BankDaoImpl();
-        }
-        return bankDaoImpl;
-    }
+    public BankDao() {}
     /**
      * ¸üÐÂÓà¶î
      * @param userBean

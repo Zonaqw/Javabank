@@ -1,34 +1,40 @@
 
  package com.cx.bank.manager;
 
- import com.cx.bank.dao.BankDaoImpl;
+ import com.cx.bank.dao.BankDaoInterface;
+ import com.cx.bank.factory.UserDaoFactory;
  import com.cx.bank.model.MoneyBean;
  import com.cx.bank.model.UserBean;
  import com.cx.bank.util.AccountOverDrawnException;
  import com.cx.bank.util.InvalidDepositException;
- import org.junit.Test;
 
  import java.io.File;
  import java.io.IOException;
 
  public class ManagerImpl implements Manager {
 
-     private static ManagerImpl managerImpl;
 
-     public BankDaoImpl bankDaoImpl=BankDaoImpl.getInstance();
+     private static ManagerImpl managerImpl;
 
      public MoneyBean moneyBean=new MoneyBean();
 
      public UserBean userBean=new UserBean();
 
-     private ManagerImpl(){}
+     BankDaoInterface userDao;
 
-     public static ManagerImpl getInstance(){
+     //通过单例模式创建对象，对象只能创建一次
+     private ManagerImpl() {
+         UserDaoFactory userDaoFactory=UserDaoFactory.getInstance();
+          userDao=userDaoFactory.createUserDao();
+     }
+
+     public static ManagerImpl getInstance() {
          if (managerImpl == null) {
              return new ManagerImpl();
          }
          return managerImpl;
      }
+
 
      /**
       * 返回余额
@@ -86,7 +92,7 @@
     userBean.setName(_uname);
     userBean.setPassword(_upwd);
     moneyBean.setMoney(10.0);
-    bankDaoImpl.insertUser(userBean,moneyBean);
+      userDao.insertUser(userBean,moneyBean);
     return true;
   }
 
@@ -103,7 +109,7 @@
     new File(".\\"+_uname + ".properties");
 
     userBean.setName(_uname);
-    bankDaoImpl.findUser(userBean,moneyBean);
+      userDao.findUser(userBean,moneyBean);
 
 
     if(!_upwd.equals(userBean.getPassword())) flag=false;
@@ -138,7 +144,7 @@ public void test(){
 
 		if(money0>moneyBean.getMoney()) flag=false;
 
-		bankDaoImpl.transfer(moneyBean,_uname,money);
+        userDao.transfer(moneyBean,_uname,money);
 
 		return flag;
 	 }
@@ -149,7 +155,7 @@ public void test(){
     */
   @Override
   public void exitSystem() throws IOException {
-    bankDaoImpl.updateMoney(userBean,moneyBean);
+      userDao.updateMoney(userBean,moneyBean);
     System.exit(0);
   }
   /*@Test

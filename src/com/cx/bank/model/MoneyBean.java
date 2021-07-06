@@ -1,7 +1,8 @@
 
  package com.cx.bank.model;
 
-/*@projectName Javabank
+/**
+ * @projectName Javabank
  * @package com.cx.bank.model
  * @className MoneyBean
  * @description 用于封装余额数据
