@@ -1,37 +1,42 @@
+package com.cx.bank.dao;
 
-  package com.cx.bank.dao;
+import com.cx.bank.model.MoneyBean;
+import com.cx.bank.model.UserBean;
 
-  import java.io.IOException;
+import java.io.IOException;
 
-  public interface BankDaoInterface {
+public interface BankDaoInterface{
     /**
-     * 存储方式说明
-     */
-    void AddBank();
-
-    /**
-     * 用户注册说明
-     * @param uname
-     * @param upwd
+     * 更新money
+     * @param userBean
+     * @param moneyBean
      * @throws IOException
      */
-      void register(String uname,String upwd) throws IOException;
+    void updateMoney(UserBean userBean, MoneyBean moneyBean) throws IOException;
 
     /**
-     * 用户登录说明
-     * @param uname
-     * @param upwd
+     * 插入用户
+     * @param userBean
+     * @param moneyBean
      * @throws IOException
      */
-      void login(String uname,String upwd) throws IOException;
-
-
+    void insertUser(UserBean userBean, MoneyBean moneyBean) throws IOException;
 
     /**
-     * 转账说明
-     * @param others
+     * 寻找用户
+     * @param userBean
+     * @param moneyBean
+     * @throws IOException
+     */
+    void findUser(UserBean userBean, MoneyBean moneyBean) throws IOException;
+
+    /**
+     * 转账
+     * @param moneyBean
+     * @param _uname
      * @param money
      * @throws IOException
      */
-      void transfer(String others,String money) throws IOException;
-  }
+
+    void transfer(MoneyBean moneyBean, String _uname, String money) throws IOException;
+}

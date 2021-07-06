@@ -4,163 +4,162 @@
  import com.cx.bank.dao.BankDaoImpl;
  import com.cx.bank.model.MoneyBean;
  import com.cx.bank.model.UserBean;
- import com.cx.bank.util.*;
+ import com.cx.bank.util.AccountOverDrawnException;
+ import com.cx.bank.util.InvalidDepositException;
+ import org.junit.Test;
 
  import java.io.File;
- import java.io.FileInputStream;
  import java.io.IOException;
- import java.io.InputStream;
- import java.util.Properties;
- import java.util.Scanner;
 
- import static com.cx.bank.dao.BankDaoImpl.properties;
+ public class ManagerImpl implements Manager {
 
- /*@projectName Javabank
- * @package com.cx.bank.manager
- * @className ManagerImpl
- * @description 用于实现各种功能模块
- * @version v1.4
- * */
- public class ManagerImpl implements Manager{
-    private static ManagerImpl managerimpl;
+     private static ManagerImpl managerImpl;
 
-    Scanner in = new Scanner(System.in);
-    private ManagerImpl(){}
-    public static ManagerImpl getManagerImpl() {
-        if (managerimpl == null) {
-            managerimpl = new ManagerImpl();
-        }
-        return managerimpl;
-    }
+     public BankDaoImpl bankDaoImpl=BankDaoImpl.getInstance();
 
-     /**创建对象
-      * MoneyBean对象，暂时存储money
-      * BankDaoImpl对象，存储并读取数据
-      * props对象，将读取的数据暂时存储
-      */
-    UserBean userBean=UserBean.getUserBean();
-    MoneyBean m1 = MoneyBean.getMoneyBean();
-    BankDaoImpl b1 = BankDaoImpl.getBankDaoImpl();
-    Properties props = BankDaoImpl.getProps();
+     public MoneyBean moneyBean=new MoneyBean();
 
-    /*
-    * 退出系统
-    * */
-    public void exitSystem(){
-      b1.AddBank();
-      System.out.println("退出成功");
-      System.exit(1); }
+     public UserBean userBean=new UserBean();
 
-    /*查询余额，对账户中的money进行查询操作
-    * @return 返回余额
-    * */
-    public double inquiry(){ return m1.getMoney(); }
+     private ManagerImpl(){}
 
-    /*从银行里取钱
-     *@param qumoney
-     */
-    public void withdrawals(Double qumoney) throws AccountOverDrawnException {
-            if(qumoney>inquiry()){
-                throw new AccountOverDrawnException("余额不足");
-            }
-            else if(qumoney<0){
-                throw new AccountOverDrawnException("取钱不能取负的");
-            }
-            m1.setMoney(m1.getMoney() - qumoney);
-        }
-    /*
-    * 从银行里存钱
-    * @param cunmoney
-    * */
-    public void deposit(Double cunmoney) throws InvalidDepositException {
-        if(cunmoney < 0) {
-        throw new InvalidDepositException("存钱不能存负的");
-        }
-    m1.setMoney(m1.getMoney() + cunmoney);
-    }
-
-  /**
-   * 用户注册
-   * @param _uname
-   * @param _upwd
-   * @return flag
-   */
-     @Override
-     public void register(String _uname,String _upwd) throws RegisterException, IOException {
-
-            //用户名和密码不能为空
-            if(_uname==null||_upwd==null){
-              throw new RegisterException("用户名和密码不能为空");
-            }
-
-            //用户和密码不能已经存在
-            File dir = new File(".\\"+_uname+".properties");
-            if (dir.exists()){
-
-              throw new RegisterException("用户已经存在");
-            }
-
-            //将用户名和密码写入文件中
-
-              b1.register(_uname, _upwd);
-
-     }
-
-  /**
-   * 用户登录
-   * @param  _uname
-   * @param  _upwd
-   * @return flag
-   */
-     @Override
-     public void login(String _uname,String _upwd) throws LoginException, IOException {
-        //用户名和密码不能为空
-        if (_uname == null || _upwd == null) {
-           throw new LoginException("用户名和密码不能为空");
-        }
-        //用户名和密码不能不存在
-         File dir = new File(".\\"+_uname+".properties");
-         if (!dir.exists()){
-           throw new LoginException("用户不存在");
+     public static ManagerImpl getInstance(){
+         if (managerImpl == null) {
+             return new ManagerImpl();
          }
-
-        //读取并存储数据
-         b1.login(_uname, _upwd);
-        //判断输入的用户名和密码是否正确，如果错误，显示登录失败
-        if(_uname.equals(props.getProperty("uname"))&&_upwd.equals(props.getProperty("upwd"))){
-          userBean.setName(props.getProperty("uname"));
-          userBean.setPassword(props.getProperty("upwd"));
-          m1.setMoney(Double.parseDouble(props.getProperty("money")));
-        }else {
-          throw new LoginException("用户名或密码错误");
-        }
-
+         return managerImpl;
      }
+
+     /**
+      * 返回余额
+      * @return money
+      */
+  @Override
+  public Double inquiry() {
+   return moneyBean.getMoney();
+  }
+
+     /**
+      *取钱
+      * @param qumoney
+      * @throws AccountOverDrawnException
+      */
+  @Override
+  public void withdrawals(String qumoney) throws AccountOverDrawnException {
+       double qumoney0=Double.parseDouble(qumoney);
+      if(qumoney0>moneyBean.getMoney()){
+       throw new AccountOverDrawnException();
+      }
+      if(qumoney0<0){
+          throw new AccountOverDrawnException();
+      }
+      double money=moneyBean.getMoney()-qumoney0;
+      moneyBean.setMoney(money);
+  }
+
+     /**
+      * 存钱
+      * @param cunmoney
+      * @throws InvalidDepositException
+      */
+  @Override
+  public void deposit(String cunmoney) throws InvalidDepositException {
+    double cunmoney0=Double.parseDouble(cunmoney);
+    if(cunmoney0<0){
+        throw new InvalidDepositException();
+    }
+    double money=moneyBean.getMoney()+cunmoney0;
+    moneyBean.setMoney(money);
+  }
 
    /**
-    *
-    * @param others
-    * @param money
+    * 注册
+    * @param _uname
+    * @param _upwd
     * @return
+    * @throws IOException
     */
   @Override
-  public  void transfer(String others, String money) throws IOException, TransferException {
-
-    File file = new File(".//"+others+".properties");
-    if (!file.exists()){
-      throw new TransferException("没有这个用户");
-    }
-    if(Double.parseDouble(money)>m1.getMoney()) {
-      throw new TransferException("余额不足");
-    }
-    if(Double.parseDouble(money)<0){
-      throw new TransferException("金额不能为负数");
-    }
-    b1.transfer(others, money);
-    if(properties.getProperty("uname").equals(userBean.getName())){
-      throw new TransferException("不能给自己转账");
-    }
-
-
+  public boolean register(String _uname, String _upwd) throws IOException {
+    File file = new File(".\\"+_uname+".properties");
+    if (file.exists()) return false;
+    userBean.setName(_uname);
+    userBean.setPassword(_upwd);
+    moneyBean.setMoney(10.0);
+    bankDaoImpl.insertUser(userBean,moneyBean);
+    return true;
   }
-}
+
+   /**
+    * 登录
+    * @param _uname
+    * @param _upwd
+    * @return
+    * @throws IOException
+    */
+  @Override
+  public boolean login(String _uname, String _upwd) throws IOException {
+    boolean flag=true;
+    new File(".\\"+_uname + ".properties");
+
+    userBean.setName(_uname);
+    bankDaoImpl.findUser(userBean,moneyBean);
+
+
+    if(!_upwd.equals(userBean.getPassword())) flag=false;
+    return flag;
+  }
+/*@Test
+public void test(){
+
+	try {
+		login("zqw","123");
+	} catch (IOException e) {
+		System.out.println(e.getMessage());
+	}
+}*/
+
+     /**
+      * 转账
+      * @param _uname
+      * @param money
+      * @return
+      * @throws IOException
+      */
+	 @Override
+	 public boolean transfer(String _uname, String money) throws IOException {
+  	    boolean flag = true;
+		File file = new File(".\\"+_uname + ".properties");
+
+		if (!file.exists()) flag=false;
+		double money0=Double.parseDouble(money);
+
+		if(money0<0) flag=false;
+
+		if(money0>moneyBean.getMoney()) flag=false;
+
+		bankDaoImpl.transfer(moneyBean,_uname,money);
+
+		return flag;
+	 }
+
+	 /**
+    * 退出系统
+    * @throws IOException
+    */
+  @Override
+  public void exitSystem() throws IOException {
+    bankDaoImpl.updateMoney(userBean,moneyBean);
+    System.exit(0);
+  }
+  /*@Test
+   public void test(){
+    String name="zqw";
+    String pwd="123";
+    try {
+      System.out.println(register(name, pwd));
+    }catch (IOException e){
+      System.out.println(e);
+    }
+  }*/
+ }

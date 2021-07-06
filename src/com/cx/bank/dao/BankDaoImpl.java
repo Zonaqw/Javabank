@@ -1,120 +1,112 @@
+package com.cx.bank.dao;
 
-  package com.cx.bank.dao;
+import com.cx.bank.model.MoneyBean;
+import com.cx.bank.model.UserBean;
+import com.cx.bank.util.MD5;
+import org.junit.Test;
 
+import java.io.*;
+import java.util.Properties;
 
-  import com.cx.bank.util.MD5;
+public class BankDaoImpl implements BankDaoInterface{
 
-  import java.io.*;
-  import java.util.Properties;
+    private static BankDaoImpl bankDaoImpl;
 
-  import static com.cx.bank.manager.ManagerImpl.m1;
-  import static com.cx.bank.manager.ManagerImpl.userBean;
+  //  private BankDaoImpl(){}
 
-  /*@projectName Javabank
-  * @package com.cx.bank.dao
-  * @className BankDaoImpl
-  * @description 用于实现各种功能模块的数据存储
-  * @version v1.4*/
-  public class BankDaoImpl implements BankDaoInterface
-  {
-      private static Properties props;
-      public static Properties properties;
-      private static BankDaoImpl bankDaoImpl;
-
-      private BankDaoImpl() {
-
-      }
-      public static BankDaoImpl getBankDaoImpl() {
-          if(bankDaoImpl == null)
-              bankDaoImpl=new BankDaoImpl();
-          return bankDaoImpl;
-      }
-      //静态代码块，给静态变量初始化
-   static
-      {
-          try
-          {
-              props = new Properties();
-              File f=new File(".\\Bank.properties");
-              FileInputStream in = new FileInputStream(f);
-              props.load(in);
-              in.close();
-          }
-          catch(IOException e)
-          {
-              e.printStackTrace();
-          }
-
-      }
-
-
-      public static Properties getProps() {
-          return props;
-      }
-
-      /**
-       * 将MoneyBean的账户余额存储到该用户的properties文件中
-       */
-      @Override
-      public void AddBank() {
-          props.setProperty("money",String.valueOf(m1.getMoney()));
-          try{
-              FileOutputStream out = new
-                      FileOutputStream(".\\"+userBean.getName()+".properties");
-              props.store(out, "");
-              out.close();
-          }
-          catch(IOException e)
-          {
-              System.out.println(e);
-          }
-      }
-
-      /*实现注册功能
-      * */
-      @Override
-      public void register(String _uname,String _upwd) throws IOException {
-          MD5 md5=new MD5();
-          props.setProperty("uname",_uname);
-          props.setProperty("upwd", md5.getMD5(_upwd));
-          props.setProperty("money","10.0");
-
-          FileOutputStream out = new FileOutputStream(".\\"+_uname+".properties");
-          props.store(out,"");
-          out.close();
-      }
-      /*
-      * 实现登录功能
-      * */
-      @Override
-      public void login(String _uname,String _upwd) throws IOException {
-              File f0=new File(".\\"+_uname+".properties");
-              FileInputStream input = new FileInputStream(f0);
-              props.load(input);
-              input.close();
-      }
+    public static BankDaoImpl getInstance() {
+        if (bankDaoImpl == null) {
+          return new BankDaoImpl();
+        }
+        return bankDaoImpl;
+    }
     /**
-     * 转账功能实现
-     * @param others
-     * @param money
+     * 更新余额
+     * @param userBean
+     * @param moneyBean
+     * @throws IOException
      */
-      @Override
-      public void transfer(String others,String money) throws IOException  {
-          //读取要转账对象的文件
-          properties=new Properties();
-          File f0=new File(".\\"+others+".properties");
-          FileInputStream input = new FileInputStream(f0);
-          properties.load(input);
-          input.close();
+    @Override
+    public void updateMoney(UserBean userBean, MoneyBean moneyBean) throws IOException {
 
-          m1.setMoney(m1.getMoney()-Double.parseDouble(money));
+        Properties props = new Properties();
+        props.setProperty("uname",userBean.getName());
+        props.setProperty("upwd",userBean.getPassword());
+        props.setProperty("money",String.valueOf(moneyBean.getMoney()));
+        FileOutputStream output =new FileOutputStream(".\\"+userBean.getName()+".properties");
+        props.store(output,"");
+        output.close();
+    }
 
-          //改变转账对象的数据
-          String money0=String.valueOf(Double.parseDouble(properties.getProperty("money"))+Double.parseDouble(money));
-          properties.setProperty("money",money0);
-          FileOutputStream out = new FileOutputStream(".\\"+others+".properties");
-          properties.store(out,".\\"+others+".properties");
-          out.close();
+    /**
+     * 插入用户
+     * @param userBean
+     * @param moneyBean
+     * @throws IOException
+     */
+    @Override
+    public void insertUser(UserBean userBean, MoneyBean moneyBean) throws IOException {
+        Properties props = new Properties();
+        MD5 md5=new MD5();
 
-      }
-  }
+        props.setProperty("uname",userBean.getName());
+
+        props.setProperty("upwd",md5.getMD5(userBean.getPassword()));
+
+        String money=String.valueOf(moneyBean.getMoney());
+
+        props.setProperty("money",money);
+        FileOutputStream output = new FileOutputStream(".\\"+userBean.getName() + ".properties");
+        props.store(output,"");
+        output.close();
+    }
+
+    /**
+     * 查找用户
+     * @param userBean
+     * @param moneyBean
+     */
+    @Override
+    public void findUser(UserBean userBean, MoneyBean moneyBean) throws IOException {
+        Properties props = new Properties();
+        FileInputStream input = new FileInputStream(".\\"+userBean.getName() + ".properties");
+        props.load(input);
+
+        userBean.setName(props.getProperty("uname"));
+        userBean.setPassword(props.getProperty("upwd"));
+        moneyBean.setMoney(Double.parseDouble(props.getProperty("money")));
+        input.close();
+    }
+@Test
+public void test() throws IOException {
+        UserBean userBean = new UserBean();
+        MoneyBean moneyBean = new MoneyBean();
+        userBean.setName("zqw");
+        findUser(userBean,moneyBean);
+}
+    /**
+     *
+     * @param moneyBean
+     * @param _uname
+     * @param money
+     * @throws IOException
+     */
+    @Override
+    public void transfer(MoneyBean moneyBean, String _uname, String money) throws IOException {
+        Properties props = new Properties();
+        File file = new File(".\\"+_uname + ".properties");
+
+        FileInputStream input = new FileInputStream(file);
+        props.load(input);
+        input.close();
+
+        moneyBean.setMoney(moneyBean.getMoney()-Double.parseDouble(money));
+        double money0=Double.parseDouble(props.getProperty("money"))+Double.parseDouble(money);
+
+        props.setProperty("money",String.valueOf(money0));
+
+        FileOutputStream output = new FileOutputStream(file);
+        props.store(output,"");
+
+    }
+}

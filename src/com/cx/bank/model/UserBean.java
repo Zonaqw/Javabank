@@ -9,17 +9,9 @@ package com.cx.bank.model;
  */
 public class UserBean {
     private String name;
-    private String password;
-    private static UserBean userBean;
-    private UserBean() {
 
-    }
-    public static UserBean getUserBean() {
-        if (userBean == null) {
-            userBean = new UserBean();
-        }
-        return userBean;
-    }
+    private String password;
+    public UserBean(){}
 
     public void setName(String name) { this.name = name; }
 

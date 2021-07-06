@@ -1,123 +1,163 @@
 
- package com.cx.bank.test;
- import com.cx.bank.dao.BankDaoImpl;
- import com.cx.bank.manager.ManagerImpl;
- import com.cx.bank.model.MoneyBean;
- import com.cx.bank.model.UserBean;
- import com.cx.bank.util.*;
+	 package com.cx.bank.test;
 
+	 import com.cx.bank.manager.ManagerImpl;
+	 import com.cx.bank.util.AccountOverDrawnException;
+	 import com.cx.bank.util.InvalidDepositException;
+	 import com.cx.bank.util.MD5;
 
- import java.io.IOException;
- import java.util.Scanner;
+	 import java.io.IOException;
+	 import java.util.Scanner;
 
- public class TestBank {
-     public static void main(String[] args) {
-         while (true) {
-             register0();
-             ManagerImpl manager = ManagerImpl.getManagerImpl();
-             Scanner in = new Scanner(System.in);
-             String i = in.next();
-             if ("1".equals(i)) {
-                 System.out.println("用户名");
-                 String uname = in.next();
-                 System.out.println("密码");
-                 String upwd = in.next();
-                try {
-                   manager.register(uname,upwd);
-                        System.out.println("注册成功");
+	 public class TestBank{
+	   public static void main(String[] args) {
+		   ManagerImpl managerImpl=ManagerImpl.getInstance();
+		   while (true) {
+		   register0();
+	        Scanner sc = new Scanner(System.in);
+	        String i=sc.next();
+		        if (i.equals("1")) {
+			        System.out.print("用户名：");
+			        String uname = sc.next();
+			        System.out.print("密码：");
+			        String upwd = sc.next();
+			        try {
+				        boolean flag = managerImpl.register(uname, upwd);
 
-                }catch (RegisterException|IOException e){
-                    System.out.println(e.getMessage());
-                    System.out.println("注册失败");
-                }
+				        if (!flag) System.out.println("注册失败");
+				        else System.out.println("注册成功");
 
-             } else if ("2".equals(i)) {
+			        } catch (IOException e) {
+				        System.out.println(e);
+			        }
+		        } else if (i.equals("2")) {
+			        try {
+				        System.out.print("用户名：");
+				        String name = sc.next();
+				        System.out.print("密码：");
+				        String pwd = sc.next();
+				        MD5 md5 = new MD5();
+				        String pwd0 = md5.getMD5(pwd);
+				        boolean flag = managerImpl.login(name, pwd0);
+				        if (flag) {
+					        System.out.println("登录成功");
+					        while (true) {
 
-                 System.out.println("请输入用户名");
-                 String uname = in.next();
-                 System.out.println("请输入密码");
-                 String upwd = in.next();
+						        System.out.println("---------欢迎进入银行-------------");
+						        System.out.println("----       1：查询余额  ----------");
+						        System.out.println("----       2：取款      ----------");
+						        System.out.println("----       3：存款      ----------");
+						        System.out.println("----       4：转账      ----------");
+						        System.out.println("----       5：退出      ----------");
+						        System.out.println("--------------------------------");
+						        Scanner scanner = new Scanner(System.in);
+						        String a = scanner.next();
 
-                 //判断用户名或密码是否正确,若正确，进入登录页面
-                 try {
-                     manager.login(uname, upwd);
-                     System.out.println("登录成功");
-                     while(true) {
-                         /*
-                           登录成功，进入登录页面
-                          */
-                         loginin();
-                         String a = in.next();
-                         if ("1".equals(a)){
-                             System.out.println("您的余额为:"+manager.inquiry());
-                         }else if ("2".equals(a)){
-                             try {
-                                 System.out.println("您想取多少钱？");
-                                 String qumoney = in.next();
-                                 manager.withdrawals(Double.parseDouble(qumoney));
-                                 System.out.println("取款成功，您的余额为："+manager.inquiry());
-                             }catch (AccountOverDrawnException e){
-                                 System.out.println("warning:"+e.getMessage());
-                             }
-                         }else if("3".equals(a)){
-                             try {
-                                 System.out.println("您想存多少钱？");
-                                 String cunmoney = in.next();
-                                 manager.deposit(Double.parseDouble(cunmoney));
-                                 System.out.println("存款成功，您的余额为："+manager.inquiry());
-                             }catch (InvalidDepositException e){
-                                 System.out.println("warning:"+e.getMessage());
-                             }
-                         }else if ("4".equals(a)) {
-                             System.out.println("请输入您想转账的对象");
-                             String others = in.next();
-                             System.out.println("请输入转账金额");
-                             String zhuanmoney = in.next();
-                             try {
-                                 manager.transfer(others,zhuanmoney);
-                                 System.out.println("转账成功");
+						        if (a.equals("1")) {
+							        System.out.println("您的余额为：" + managerImpl.inquiry());
 
-                             }catch (IOException e) {
-                                 System.out.println("没有这个用户");
-                                 System.out.println("转账失败");
-                             }catch (TransferException ex){
-                                 System.out.println(ex.getMessage());
-                                 System.out.println("转账失败");
-                             }
-                         } else if ("5".equals(a)){
-                             manager.exitSystem();
-                         }
-                     }
-                 } catch (LoginException | IOException e) {
-                     System.out.println(e.getMessage());
-                     System.out.println("登录失败");
-                 }
+						        } else if (a.equals("2")) {
+							        try {
+								        System.out.print("请输入取款金额：");
+								        String qumoney = scanner.next();
+								        managerImpl.withdrawals(qumoney);
+							        } catch (AccountOverDrawnException e) {
+								        System.out.println("取款失败");
+							        }
+						        } else if (a.equals("3")) {
+							        try {
+								        System.out.println("请输入存款金额：");
+								        String cunmoney = scanner.next();
+								        managerImpl.deposit(cunmoney);
+							        } catch (InvalidDepositException e) {
+								        System.out.println("存款失败");
+							        }
+						        } else if (a.equals("4")) {
+							        try {
+								        System.out.print("转账对象：");
+								        String uname = scanner.next();
+								        System.out.print("转账金额");
+								        String zmoney = scanner.next();
+								        managerImpl.transfer(uname, zmoney);
+							        } catch (IOException e) {
+								        System.out.println(e.getMessage());
+							        }
+						        } else if (a.equals("5")) {
+							        try {
+								        managerImpl.exitSystem();
+							        } catch (IOException e) {
+								        System.out.println(e.getMessage());
+							        }
+						        }
+					        }
+				        } else System.out.println("登录失败");
+			        } catch (IOException e) {
+				        System.out.println(e.getMessage());
+			        }
+		        } else if (i.equals("3")) {
+			        System.out.println("欢迎下次光临");
+			        System.exit(0);
+		        }
+	        }
+	 }
+	 public static void register0(){
+		  System.out.println("---------欢迎进入银行-------------");
+		  System.out.println("----       1：注册      ----------");
+		  System.out.println("----       2：登录      ----------");
+		  System.out.println("----       3：退出      ----------");
+		  System.out.println("--------------------------------");
+	 }
+	/* public static void login0() {
+		 while (true) {
 
-             } else if ("3".equals(i)) {
-                 manager.exitSystem();
-             }
+		 	 System.out.println("---------欢迎进入银行-------------");
+			 System.out.println("----       1：查询余额  ----------");
+			 System.out.println("----       2：取款      ----------");
+			 System.out.println("----       3：存款      ----------");
+			 System.out.println("----       4：转账      ----------");
+			 System.out.println("----       5：退出      ----------");
+			 System.out.println("--------------------------------");
+			 ManagerImpl managerImpl = ManagerImpl.getInstance();
 
-         }
-     }
+			 Scanner scanner = new Scanner(System.in);
+			 String i = scanner.next();
 
-     //注册界面
-     public static void register0() {
-         System.out.println("·········  欢迎进入银行   ········");
-         System.out.println("          您可执行如下操作        ");
-         System.out.println("              1:注册             ");
-         System.out.println("              2:登录             ");
-         System.out.println("              3:退出系统          ");
-         System.out.println("·································");
-     }
-     //登录界面
-     public static void loginin() {
-         System.out.println("------   您可执行以下操作------------");
-         System.out.println("           1:查询余额               ");
-         System.out.println("           2:取款                   ");
-         System.out.println("           3:存款                   ");
-         System.out.println("           4:转账                   ");
-         System.out.println("           5:退出系统                ");
-         System.out.println("------------------------------------");
-     }
+			 if (i.equals("1")) {
+				 System.out.print("您的余额为：" + managerImpl.inquiry());
+
+			 } else if (i.equals("2")) {
+				 try {
+					 System.out.print("请输入取款金额：");
+					 String qumoney = scanner.next();
+					 managerImpl.withdrawals(qumoney);
+				 } catch (AccountOverDrawnException e) {
+					 System.out.println("取款失败");
+				 }
+			 } else if (i.equals("3")) {
+				 try {
+					 System.out.println("请输入存款金额：");
+					 String cunmoney = scanner.next();
+					 managerImpl.deposit(cunmoney);
+				 } catch (InvalidDepositException e) {
+					 System.out.println("存款失败");
+				 }
+			 } else if (i.equals("4")) {
+				 try {
+					 System.out.print("转账对象：");
+					 String name = scanner.next();
+					 System.out.print("转账金额");
+					 String zmoney = scanner.next();
+					 managerImpl.transfer(name, zmoney);
+				 } catch (IOException e) {
+					 System.out.println(e.getMessage());
+				 }
+			 } else if (i.equals("5")) {
+				 try {
+					 managerImpl.exitSystem();
+				 } catch (IOException e) {
+					 System.out.println(e.getMessage());
+				 }
+			 }
+		 }
+	 }*/
  }
-
